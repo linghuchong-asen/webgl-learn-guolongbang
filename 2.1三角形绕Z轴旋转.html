@@ -1,0 +1,156 @@
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Author: yangsen
+ * @Date: 2022-04-21 09:27:46
+ * @LastEditors: yangsen
+ * @LastEditTime: 2022-04-21 19:56:08
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+
+<body>
+  <!--通过canvas标签创建一个400px*400px大小的画布-->
+  <canvas id="webgl" width="400" height="400"></canvas>
+
+  <script>
+    //顶点着色器
+    var VSHADER_SOURCE = '' +
+      'attribute vec4 a_Position;\n' + //声明attribute变量a_Position，用来存放顶点位置信息
+      'uniform mat4 u_RotateMatrix;\n' + //声明uniform变量u_RotateMatrix(类型是mat4)，用来存放旋转矩阵
+      'void main(){\n' +
+      '  gl_Position = u_RotateMatrix * a_Position;\n' + //将旋转矩阵与顶点坐标相乘赋值给顶点着色器内置变量gl_Position
+      '}\n';
+
+    //片元着色器
+    var FSHADER_SOURCE = '' +
+      'precision mediump float;\n' + // 设置精度
+      'uniform vec4 u_FragColor;\n' + //声明uniform变量u_FragColor，用来存放顶点颜色信息
+      'void main(){\n' +
+      //通过u_FragColor变量设置片元颜色
+      ' gl_FragColor = u_FragColor;\n' +
+      '}\n';
+
+    //初始化着色器函数
+    function initShader(gl, VSHADER_SOURCE, FSHADER_SOURCE) {
+      //创建顶点着色器对象
+      var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+      //创建片元着色器对象
+      var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+      //引入顶点、片元着色器源代码
+      gl.shaderSource(vertexShader, VSHADER_SOURCE);
+      gl.shaderSource(fragmentShader, FSHADER_SOURCE);
+      //编译顶点、片元着色器
+      gl.compileShader(vertexShader);
+      gl.compileShader(fragmentShader);
+
+      //创建程序对象program
+      var program = gl.createProgram();
+      //附着顶点着色器和片元着色器到program
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      //链接program
+      gl.linkProgram(program);
+      //使用program
+      gl.useProgram(program);
+      gl.program = program
+      //返回程序program对象
+      return program;
+    }
+
+    function init() {
+      //通过getElementById()方法获取canvas画布
+      var canvas = document.getElementById('webgl');
+      //通过方法getContext()获取WebGL上下文
+      var gl = canvas.getContext('webgl');
+      //初始化着色器
+      initShader(gl, VSHADER_SOURCE, FSHADER_SOURCE);
+
+      // 设置canvas的背景色
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+      //清空canvas
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      //给片元着色器uniform变量u_FragColor赋值
+      setFragColor(gl)
+
+      //初始化顶点
+      var n = initVertexBuffers(gl)
+
+      //获取顶点着色器uniform变量u_RotateMatrix(旋转矩阵)的存储地址
+      var u_RotateMatrix = gl.getUniformLocation(gl.program, 'u_RotateMatrix')
+      console.log(u_RotateMatrix);
+
+      //定义要旋转的角度
+      var ANGLE = 60.0
+      var rad = Math.PI * ANGLE / 180.0 //将角度转换为弧度
+      var cosB = Math.cos(rad)
+      var sinB = Math.sin(rad)
+
+      //创建绕Z轴旋转矩阵的类型化数组
+      var rotateMatrix = new Float32Array([
+        cosB, sinB, 0.0, 0.0,
+        -sinB, cosB, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ])
+
+      //向顶点着色器uniform变量u_RotateMatrix传值
+      gl.uniformMatrix4fv(u_RotateMatrix, false, rotateMatrix)
+
+      //绘制三角形
+      gl.drawArrays(gl.TRIANGLES, 0, n)
+
+    }
+
+    //给片元着色器uniform变量u_FragColor赋值
+    function setFragColor(gl) {
+      //获取片元着色器uniform变量u_FragColor的存储地址
+      var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
+      //向片元着色器uniform变量u_FragColor传值
+      gl.uniform4f(u_FragColor, 0.0, 1.0, 0.0, 1.0) //绿色
+    }
+
+    //初始化顶点
+    function initVertexBuffers(gl) {
+      var vertices = new Float32Array([
+        0.0, 0.5,
+        -0.5, -0.5,
+        0.5, -0.5
+      ])
+
+      //1.创建缓冲区对象
+      var vertexBuffer = gl.createBuffer();
+      if (!vertexBuffer) {
+        console.log('创建缓冲区对象失败！')
+        return -1
+      }
+
+      //2.将缓冲区对象绑定到目标
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+
+      //3.向缓冲区对象中写入数据
+      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
+
+      var a_Position = gl.getAttribLocation(gl.program, 'a_Position'); //获取着色器attribute变量a_Position的存储地址
+
+      //4.将缓冲区对象分配给a_Position变量
+      gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
+
+      //5.连接a_Position变量与分配给它的缓冲区对象
+      gl.enableVertexAttribArray(a_Position)
+
+      return vertices.length / 2
+
+    }
+    init()
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!-- @format -->
+
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Author: yangsen
+ * @Date: 2022-03-28 21:12:47
+ * @LastEditors: yangsen
+ * @LastEditTime: 2022-04-21 20:34:05
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+</head>
+
+<body>
+  <canvas id="webgl" width="500" height="500" style="background-color: #0d72da"></canvas>
+  <script>
+    var canvasElement = document.getElementById('webgl');
+    var gl = canvasElement.getContext('webgl');
+    //顶点着色器源码
+    var vertexShaderSource =
+      '' +
+      //attribute声明vec4类型变量apos
+      'attribute vec4 apos;' +
+      'uniform mat4 mz;' +
+      'void main(){' +
+      //顶点坐标apos赋值给内置变量gl_Position
+      '   gl_Position =mz*apos;' +
+      '}';
+    //片元着色器源码
+    var fragShaderSource = '' + 'void main(){' + '   gl_FragColor = vec4(1.0,0.0,0.0,1.0);' + '}';
+    //初始化着色器
+    var program = initShader(gl, vertexShaderSource, fragShaderSource);
+    //获取顶点着色器的位置变量apos
+    var aposLocation = gl.getAttribLocation(program, 'apos');
+    var mz = gl.getUniformLocation(program, 'mz')
+
+    //9个元素构建三个顶点的xyz坐标值
+    var data = new Float32Array([0, 0, 1, 0, 1, 0, 1, 0, 0]);
+
+    //创建缓冲区对象
+    var buffer = gl.createBuffer();
+    //绑定缓冲区对象
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    //顶点数组data数据传入缓冲区
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    //第二个代码案例vertexAttribPointer方法的第二个参数是2，这里是3
+    gl.vertexAttribPointer(aposLocation, 3, gl.FLOAT, false, 0, 0);
+    //允许数据传递
+    gl.enableVertexAttribArray(aposLocation);
+    //定义要旋转的角度
+    var ANGLE = 60.0
+    var rad = Math.PI * ANGLE / 180.0 //将角度转换为弧度
+    var cosB = Math.cos(rad)
+    var sinB = Math.sin(rad)
+
+    //创建绕Z轴旋转矩阵的类型化数组
+    var rotateMatrix = new Float32Array([
+      cosB, sinB, 0.0, 0.0,
+      -sinB, cosB, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.0, 0.0, 0.0, 1.0
+    ])
+
+    //向顶点着色器uniform变量u_RotateMatrix传值
+    gl.uniformMatrix4fv(mz, false, rotateMatrix)
+    //开始绘制图形，使用TRIANGLES模式，三点构成一个平面
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    //声明初始化着色器函数
+    function initShader(gl, vertexShaderSource, fragmentShaderSource) {
+      var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+      var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(vertexShader, vertexShaderSource);
+      gl.shaderSource(fragmentShader, fragmentShaderSource);
+      gl.compileShader(vertexShader);
+      gl.compileShader(fragmentShader);
+      var program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      gl.useProgram(program);
+      return program;
+    }
+  </script>
+</body>
+
+</html>

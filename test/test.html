@@ -1,0 +1,36 @@
+<!-- @format -->
+
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Author: yangsen
+ * @Date: 2022-04-02 16:42:36
+ * @LastEditors: yangsen
+ * @LastEditTime: 2022-04-28 09:23:57
+-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <style></style>
+</head>
+
+<body>
+  <script>
+    var image = new Image();
+    image.onload = () => {
+      console.log('图片加载完成')
+    };
+    image.src = '../public/glb.jpg';
+    console.log(image);
+    document.body.appendChild(image)
+
+  </script>
+
+</body>
+
+</html>
