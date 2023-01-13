@@ -1,10 +1,10 @@
 <!--
- * @Description: 
+ * @Description: 点光源与平行光区别：点光源要设置光源位置，然后利用光源位置与物体位置计算光照方向；平行光有方向无需设置光源位置
  * @Version: 2.0
  * @Author: yangsen
  * @Date: 2022-04-12 20:58:58
  * @LastEditors: yangsen
- * @LastEditTime: 2022-04-12 21:36:36
+ * @LastEditTime: 2022-08-12 18:11:18
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +26,7 @@
             'attribute vec4 a_color;' +//attribute声明顶点颜色变量
             /**用于光照计算的变量a_normal、u_lightColor**/
             'attribute vec4 a_normal;' +//法向量变量
-            'uniform vec3 u_lightColor;' + //uniform声明平行光颜色变量
+            'uniform vec3 u_lightColor;' + //uniform声明点光源颜色变量
             'varying vec4 v_color;' +//varying声明顶点颜色插值后变量
             'void main(){' +
             //设置几何体轴旋转角度为45度，并把角度值转化为浮点值
