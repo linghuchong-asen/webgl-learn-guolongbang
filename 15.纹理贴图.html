@@ -4,7 +4,7 @@
  * @Author: yangsen
  * @Date: 2022-04-19 09:13:52
  * @LastEditors: yangsen
- * @LastEditTime: 2022-12-22 13:44:16
+ * @LastEditTime: 2023-01-29 12:02:56
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +31,7 @@
         var fragShaderSource = '' +
             'precision highp float;' +//所有float类型数据的精度是highp
             'varying vec2 v_TexCoord;' +//接收插值后的纹理坐标
-            'uniform sampler2D u_Sampler;' +//纹理图片像素数据
+            'uniform sampler2D u_Sampler;' +//纹理图片像素数据 sampler2D是一种变量类型，表示2D纹理
             'void main(){' +
             //采集纹素，逐片元赋值像素值
             'gl_FragColor = texture2D(u_Sampler,v_TexCoord);' +
